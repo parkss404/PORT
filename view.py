@@ -3,6 +3,10 @@ import random
 from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
+userlist = [
+        ["박성준" , "pkjjs5178", "pkjjs11@naver.com"],
+        ["백하준" , "1234", "12112@naver.com"],
+        ]   
 
 def main(request):
     return HttpResponse('''
@@ -18,21 +22,31 @@ def main(request):
 
 @csrf_exempt
 def login(request):
-    global CERTIID
+    global userlist
     if request.method == 'GET':
         article = '''
           <form action="/login/" method="post">
                   <p><input type="text" name="name" placeholder="이름"></p>
-                  <p><input type="text" name="PW "placeholder="PW"></p>
+                  <p><input type="text" name="pw" placeholder="PW"></p>
                   <p><input type="submit"></p>
-           </form>
+            </form>
         '''
         return HttpResponse(logintemp(article))
     
     elif request.method == 'POST':
         name = request.POST['name']
-        return HttpResponse(home(name))
-        
+        pw = request.POST['pw']
+
+        for i in userlist:
+            if(name == i[0] and pw == i[1]):
+
+                return HttpResponse(home(name))
+    
+        else:
+            return HttpResponse('''
+            <h1>로그인 오류입니다.<h1>
+            <h3><a href="/login">다시 시도</a></h3> 
+            ''')
 
 
 def logintemp(articler):
@@ -47,13 +61,14 @@ def logintemp(articler):
 
 
 def home(name):
+    
     return HttpResponse(f'''
     <html>
     <body>    
         <a href ='/userpage'>{name}님 환영합니다.</a>
         <h2><a href ='/portfolio'>PORTFOLIO</a></h2>
-        <h2><a href ='/projectarchive'>PROJECTARCHIVE</a></h2>
-        <h2><a href ='/projectarchive'>IDEA</a></h2>
+        <h2><a href ='/inproject'>PROJECTARCHIVE</a></h2>
+        <h2><a href ='/idea'>IDEA</a></h2>
     </body>
     ''')
 
@@ -65,26 +80,57 @@ def assigntemp(card):
         <h2>PORT 가입하기</h2><br>
         {card}
         <h3><a href ='/'>main으로</a></h3>
-        <h3><a href ='/login'>로그인페이지로</a></h3>
-        
+        <h3><a href ='/login'>로그인페이지로</a></h3> 
     </body>
     ''')
 
 def assign(request):
 
     if request.method == 'GET':
-    article = '''
-         <form action="/assign/" method="post">
-            <p><input type="text" name="name" placeholder="이름"></p>
-            <p><input type="text" pw="pw" placeholder="PW"></p>
-            <p><input type="text" email="email" placeholder="EMAIL"></p>
+        article = '''
+            <form action="/assign/" method="post">
+                <p><input type="text" name="name" placeholder="이름"></p>
+                <p><input type="text" name="pw" placeholder="PW"></p>
+                <p><input type="text" name="email" placeholder="EMAIL"></p>
             <button><a href = '/login'>멤버등록하기</a></button>
-        </form>
+            </form>
         '''     
         return HttpResponse(assigntemp(article))
 
     elif request.method == 'post':
+
         name = request.POST['name']
         pw = request.POST['pw']
         email = request.POST['email'] 
-     return HttpResponse(request.POST['name'])  
+        
+        single = [name,pw,email]
+
+        userlist.append(single)
+
+        return HttpResponse(request.POST['name'])  
+
+
+def projectarchive(request):
+    return HttpResponse(f'''
+        <h1><h1>
+        <h2><a href ='/DISPLAY'>DISPLAY</a></h2>
+        <h2><a href ='/PROJECT PAGE'>PROJECT PAGE</a></h2>
+        <h3>팀원일정</h3>
+        <h3>팀원정보</h3>
+    ''')
+
+
+def inproject(request):
+    return HttpResponse(f'''
+        <h1><h1>
+        <h2><a href ='/DISPLAY'></a></h2>
+        <h2><a href ='/PROJECT PAGE'>PROJECT PAGE</a></h2>
+        <h3>팀원일정</h3>
+        <h3>팀원정보</h3>
+        <h4><a href = '/' >진행 중인 프로젝트</h4>
+        <h4><a href = '/' > 프로젝트</h4>
+        <h5>+ 더보기</h5>
+        <h3><a href = '/'>프로젝트 시작하기<h3>
+        <h4>완료 프로젝트</h4>
+    ''')
+
